@@ -1,14 +1,18 @@
--- DSC 650 Portfolio Starter
--- Replace this file with the Hive DDL from your final project.
---
--- Before publishing:
---   1. Remove credentials or environment-specific secrets.
---   2. Add short comments explaining important tables.
---   3. Keep the SQL that best demonstrates your work.
-
--- Example structure only:
--- CREATE EXTERNAL TABLE your_table (
---     id STRING,
---     ...
--- )
--- STORED AS ...;
+CREATE TABLE wine_quality (
+    fixed_acidity DOUBLE,
+    volatile_acidity DOUBLE,
+    citric_acid DOUBLE,
+    residual_sugar DOUBLE,
+    chlorides DOUBLE,
+    free_sulfur_dioxide DOUBLE,
+    total_sulfur_dioxide DOUBLE,
+    density DOUBLE,
+    ph DOUBLE,
+    sulphates DOUBLE,
+    alcohol DOUBLE,
+    quality INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+TBLPROPERTIES ("skip.header.line.count"="1");

@@ -1,30 +1,62 @@
-# Apache Hive — Managed Table & SQL Validation
+# Hive Managed Table
 
-## Role in the Pipeline
+## Overview
 
-Apache Hive provides the structured SQL layer between HDFS storage and the Spark MLlib workload. The project data loaded through NiFi into HDFS is used to create and populate a Hive managed table.
+Apache Hive was used to provide a structured SQL interface over the wine quality dataset after it was ingested into HDFS.
 
-## Hive Table Design
+A managed Hive table named `wine_quality` was created with columns corresponding to the chemical characteristics of each wine sample and the final quality score.
 
-**Table name:** `[Enter table name]`
+## Table Design
 
-Explain the table schema and the key design choices made for the project dataset, including important column names, data types, and any decisions needed to make the data usable for downstream Spark processing.
+The dataset contains the following variables:
 
-## SQL Files
+- fixed_acidity
+- volatile_acidity
+- citric_acid
+- residual_sugar
+- chlorides
+- free_sulfur_dioxide
+- total_sulfur_dioxide
+- density
+- ph
+- sulphates
+- alcohol
+- quality
 
-- [`create_tables.sql`](create_tables.sql) — table creation and data-loading SQL
-- [`queries.sql`](queries.sql) — validation, exploration, and aggregation queries
+Most measurement variables were stored as `DOUBLE`, while `quality` was stored as an `INT`.
 
-## Data Load Verification
+The CSV contains a header row, so the Hive table was configured with:
 
-Explain how you confirmed that the data was successfully loaded into the managed Hive table.
+```sql
+TBLPROPERTIES ("skip.header.line.count"="1");
+```
 
-![Hive Load Results](screenshots/hive-load-results.png)
+## Data Loading
 
-## Query & Aggregation Verification
+The dataset was loaded from HDFS into the managed Hive table using:
 
-Describe the representative queries used to validate the populated table. Include at least one aggregation query and explain what the results demonstrate about the dataset and schema.
+```sql
+LOAD DATA INPATH '/tmp/wine_quality/winequality_red_clean.csv'
+INTO TABLE wine_quality;
+```
 
-![Hive Query Results](screenshots/hive-query-results.png)
+## Queries
 
-The validated Hive table becomes the structured input used by the PySpark MLlib application.
+A sample query was used to verify that individual records were loaded correctly:
+
+```sql
+SELECT * FROM wine_quality LIMIT 10;
+```
+
+An aggregation query grouped the dataset by wine quality score:
+
+```sql
+SELECT quality, COUNT(*) AS wine_count
+FROM wine_quality
+GROUP BY quality
+ORDER BY quality;
+```
+
+The aggregation confirmed that the data was correctly parsed and that multiple wine quality scores were represented in the dataset.
+
+Supporting SQL files and screenshots are included in this directory.

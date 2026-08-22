@@ -1,46 +1,90 @@
-# Apache NiFi — Data Ingestion into HDFS
+# NiFi Data Ingestion
 
-## Role in the Pipeline
+## Overview
 
-Apache NiFi provides the ingestion and orchestration layer for this project. The completed flow retrieves the project dataset and writes it into HDFS for downstream processing.
+Apache NiFi was used as the ingestion layer for the project. The source dataset was the cleaned Red Wine Quality dataset stored in the project GitHub repository as a CSV file.
 
-## Source Dataset
+The direct GitHub dataset URL used by NiFi was:
 
-**Dataset:** [Enter dataset name]  
-**GitHub direct URL:** [Enter the direct/raw GitHub URL used by the NiFi HTTP processor]
+```text
+https://raw.githubusercontent.com/pancaketoes/dsc650-wine-quality-pipeline/main/data/winequality_red_clean.csv
+```
 
-Briefly describe what the dataset contains and why it was selected.
+The NiFi flow downloaded the dataset from GitHub and wrote it into the Hadoop Distributed File System (HDFS).
 
-## Flow Design
+## NiFi Flow
 
-Describe the important processors used in the final NiFi flow and the role each processor performs.
+The flow contained three processors:
 
-| Processor / Process Group | Role in the Flow |
-|---|---|
-| [Processor name] | [What it does] |
-| [Processor name] | [What it does] |
-| [Processor name] | [What it does] |
+1. **Download File (InvokeHTTP)**  
+   Downloads the CSV dataset from the raw GitHub URL.
 
-Explain how data moves from the source URL through NiFi and into HDFS.
+2. **Update File Name (UpdateAttribute)**  
+   Sets the FlowFile filename to `winequality_red_clean.csv`.
 
-## HDFS Destination
+3. **Write File to HDFS (PutHDFS)**  
+   Writes the completed FlowFile into the HDFS directory `/tmp/wine_quality`.
 
-**HDFS path:** `[Enter final HDFS path]`
+The resulting ingestion flow was:
 
-Explain where NiFi writes the dataset and how the destination is used by the next stage of the pipeline.
+```text
+GitHub CSV
+    ↓
+InvokeHTTP
+    ↓
+UpdateAttribute
+    ↓
+PutHDFS
+    ↓
+HDFS
+```
 
-## Execution Evidence
+## Parameters
 
-### Final NiFi Flow
+The NiFi process group used the following parameter values:
 
-![NiFi Flow](screenshots/nifi-flow.png)
+```text
+DOWNLOAD FILE URL:
+https://raw.githubusercontent.com/pancaketoes/dsc650-wine-quality-pipeline/main/data/winequality_red_clean.csv
 
-### Running Flow / Queue Activity
+FILENAME:
+winequality_red_clean.csv
 
-![NiFi Running](screenshots/nifi-running.png)
+HDFS WRITE DIRECTORY:
+/tmp/wine_quality
 
-### HDFS Ingestion Verification
+USER:
+tyler
+```
 
-![HDFS Verification](screenshots/hdfs-ingestion-verification.png)
+## HDFS Verification
 
-The HDFS screenshot should show the `hdfs dfs -ls` output confirming that the project dataset was successfully written into HDFS.
+After the NiFi flow completed, the dataset was verified in HDFS using:
+
+```bash
+hdfs dfs -ls /tmp/wine_quality
+```
+
+The command confirmed that the following file had been successfully written:
+
+```text
+/tmp/wine_quality/winequality_red_clean.csv
+```
+
+This verified that NiFi successfully ingested the project dataset from GitHub and transferred it into HDFS.
+
+## Supporting Files
+
+The exported NiFi flow is stored in:
+
+```text
+flow-definition.json
+```
+
+Supporting screenshots are stored in the `screenshots` directory:
+
+```text
+nifi-flow.png
+nifi-running.png
+hdfs-ingestion-verification.png
+```
